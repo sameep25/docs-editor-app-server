@@ -1,18 +1,34 @@
+import express from "express";
 import { Server } from "socket.io";
-import dotenv from "dotenv" ;
+import { createServer } from "http";
+import cors from "cors";
+import dotenv from "dotenv";
 
 import Connection from "./database/db.js";
-import { getDocument ,updateDocument } from "./controller/documentController.js";
+import {
+  getDocument,
+  updateDocument,
+} from "./controller/documentController.js";
 
-dotenv.config() ;
+dotenv.config();
+const PORT = process.env.PORT || 9000;
+const URL = process.env.MONGODB_URI;
 
-const PORT = process.env.PORT  || 9000;
-const URL = process.env.MONGODB_URI ;
+const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:3000", // https://sameepvishwakarmadocs.netlify.app
+    methods: ["GET", "POST"],
+  })
+);
+
+const httpServer = createServer(app);
+
 Connection(URL);
 
-const io = new Server(PORT, {
+const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000", // https://sameepvishwakarmadocs.netlify.app
     methods: ["GET", "POST"],
   },
 });
@@ -37,4 +53,8 @@ io.on("connection", (socket) => {
       await updateDocument(documentId, data);
     });
   });
+});
+
+httpServer.listen(PORT, () => {
+  console.log(`server is running successfully on port ${PORT}`);
 });
