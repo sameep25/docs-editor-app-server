@@ -15,12 +15,7 @@ const PORT = process.env.PORT || 9000;
 const URL = process.env.MONGODB_URI;
 
 const app = express();
-app.use(
-  cors({
-    origin: "http://localhost:3000", // https://sameepvishwakarmadocs.netlify.app
-    methods: ["GET", "POST"],
-  })
-);
+app.use(cors());
 
 const httpServer = createServer(app);
 
@@ -28,7 +23,7 @@ Connection(URL);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000", // https://sameepvishwakarmadocs.netlify.app
+    origin: "https://sameepvishwakarmadocs.netlify.app", 
     methods: ["GET", "POST"],
   },
 });
@@ -58,3 +53,7 @@ io.on("connection", (socket) => {
 httpServer.listen(PORT, () => {
   console.log(`server is running successfully on port ${PORT}`);
 });
+
+app.get('/', (req, res) => {
+  res.send('Docs Editor app backend-server !!!')
+})
